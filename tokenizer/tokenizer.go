@@ -2,10 +2,6 @@ package tokenizer
 
 import (
 	"fmt"
-	"log"
-
-	"github.com/0suyog/mrkdwntoHTML/helpers"
-	"golang.org/x/tools/go/callgraph/rta"
 )
 
 var TokenScanners = []func(string) Token{
@@ -35,20 +31,20 @@ func tokens_as_array(plain_markdown string) []Token {
 		panic(err)
 	}
 	tokens = append(tokens, token)
-	tokens = append(tokens)
+	tokens = append(tokens, tokens_as_array(string([]rune(plain_markdown)[token.Length():]))...)
 
-	for i := range len([]rune(plain_markdown)) {
-		stringAtPos, err := helpers.AtPosition(plain_markdown, i)
-		if err != nil {
-			log.Fatal(err)
-		}
-		token, err := scan_one_token(stringAtPos)
-		if err != nil {
-			return tokens
-		}
-		tokens = append(tokens, token)
-	}
-	tokens = append(tokens, EOFToken())
+	// for i := range len([]rune(plain_markdown)) {
+	// 	stringAtPos, err := helpers.AtPosition(plain_markdown, i)
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+	// 	token, err := scan_one_token(stringAtPos)
+	// 	if err != nil {
+	// 		return tokens
+	// 	}
+	// 	tokens = append(tokens, token)
+	// }
+	// tokens = append(tokens, EOFToken())
 	return tokens
 }
 
