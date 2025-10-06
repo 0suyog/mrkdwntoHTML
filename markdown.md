@@ -1,1 +1,3 @@
-*bold* _italic_
+__Foo__ and *bar*.
+
+Another Paragraph

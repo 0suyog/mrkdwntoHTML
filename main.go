@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/0suyog/mrkdwntoHTML/parser"
 	"github.com/0suyog/mrkdwntoHTML/tokenizer"
 )
 
@@ -19,6 +20,7 @@ func main() {
 
 	tokens := tokenizer.Tokenize(plain_markdown)
 
-	fmt.Println(tokens.String())
+	treeHead := parser.Parse(*tokens)
+	fmt.Println(treeHead)
 
 }

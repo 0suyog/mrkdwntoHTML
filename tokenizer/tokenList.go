@@ -5,31 +5,35 @@ import (
 )
 
 type TokenList struct {
-	Tokens []Token
+	tokens []IToken
 }
 
-func NewTokenList(tokens []Token) *TokenList {
+func NewTokenList(tokens []IToken) *TokenList {
 	tokenList := TokenList{
-		Tokens: tokens,
+		tokens: tokens,
 	}
 	return &tokenList
 }
 
-func (tl *TokenList) Peek(tokenTypes ...string) bool {
-	if length := len(tl.Tokens); length == 0 {
+func (tl *TokenList) Tokens() []IToken {
+	return tl.tokens
+}
+
+func (tl *TokenList) Peek(tokenTypes ...TokenType) bool {
+	if length := len(tl.Tokens()); length == 0 {
 		return false
 	}
 	for i, tokenType := range tokenTypes {
-		if indexedToken := tl.Tokens[i]; indexedToken.TokenType() != tokenType {
+		if indexedToken := tl.Tokens()[i]; indexedToken.TokenType() != tokenType {
 			return false
 		}
 	}
 	return true
 }
 
-func (tl *TokenList) PeekOr(tokenTypes ...string) bool {
+func (tl *TokenList) PeekOr(tokenTypes ...[]TokenType) bool {
 	for _, tokenType := range tokenTypes {
-		if tl.Peek(tokenType) {
+		if tl.Peek(tokenType...) {
 			return true
 		}
 	}
@@ -40,11 +44,11 @@ func (tl *TokenList) Offset(index int) *TokenList {
 	if index == 0 {
 		return tl
 	}
-	offsetedTokens := tl.Tokens[index:]
+	offsetedTokens := tl.Tokens()[index:]
 	return NewTokenList(offsetedTokens)
 }
 
-func (tl *TokenList) PeekAt(index int, tokenTypes ...string) bool {
+func (tl *TokenList) PeekAt(index int, tokenTypes ...TokenType) bool {
 	if index == 0 {
 		return tl.Peek(tokenTypes...)
 	}
@@ -56,37 +60,35 @@ func (tl *TokenList) PeekAt(index int, tokenTypes ...string) bool {
 // Grab modifies the Tokens inside TokenList
 // it left shifts the list by provided amount
 // and returns the shifted elements
-func (tl *TokenList) Grab(amount int) (returnTokens []Token, e error) {
+func (tl *TokenList) Grab(amount int) (returnTokens []IToken, e error) {
 	if amount == 0 {
 		return
 	}
-	if amount == len(tl.Tokens) {
-		return returnTokens, fmt.Errorf("Invalid Amount, There are only %d elements and you are trying to select %d elements", len(tl.Tokens), amount)
+	if amount == len(tl.Tokens()) {
+		return returnTokens, fmt.Errorf("Invalid Amount, There are only %d elements and you are trying to select %d elements", len(tl.Tokens()), amount)
 	}
-	shiftedList := tl.Tokens[amount:]
-	returnTokens = tl.Tokens[0:amount]
-	tl.Tokens = shiftedList
+	shiftedList := tl.Tokens()[amount:]
+	returnTokens = tl.Tokens()[0:amount]
+	tl.tokens = shiftedList
 	return returnTokens, nil
 }
 
-func (tl *TokenList) Second() (returnToken Token, e error) {
-	if len(tl.Tokens) < 2 {
-		return returnToken, fmt.Errorf("List has less than 2 elements ")
-	}
-	return tl.Tokens[1], nil
+func (tl *TokenList) First() IToken {
+	return tl.Tokens()[0]
 }
 
-func (tl *TokenList) Third() (returnToken Token, e error) {
-	if len(tl.Tokens) < 2 {
-		return returnToken, fmt.Errorf("List has less than 3 elements ")
-	}
-	return tl.Tokens[2], nil
+func (tl *TokenList) Second() (returnToken IToken) {
+	return tl.Tokens()[1]
+}
+
+func (tl *TokenList) Third() (returnToken IToken) {
+	return tl.Tokens()[2]
 }
 
 func (tl *TokenList) String() string {
 	var joinedString string
 
-	for _, token := range tl.Tokens {
+	for _, token := range tl.Tokens() {
 		joinedString += fmt.Sprintf("%s", token.String())
 	}
 

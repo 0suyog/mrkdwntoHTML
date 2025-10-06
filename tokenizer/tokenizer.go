@@ -4,26 +4,26 @@ import (
 	"fmt"
 )
 
-var TokenScanners = []func(string) Token{
+var TokenScanners = []func(string) IToken{
 	SingleLetterScanner,
 	TextScanner,
 }
 
-func scan_one_token(plain_markdown string) (Token, error) {
+func scan_one_token(plain_markdown string) (IToken, error) {
 	for _, scanner := range TokenScanners {
 		token := scanner(plain_markdown)
 		if !token.IsNull() {
 			return token, nil
 		}
 	}
-	return NullToken(), fmt.Errorf("No scanner matched given input: %s", plain_markdown)
+	return NewNullToken(), fmt.Errorf("No scanner matched given input: %s", plain_markdown)
 }
 
-func tokens_as_array(plain_markdown string) []Token {
-	tokens := make([]Token, 0)
+func tokens_as_array(plain_markdown string) []IToken {
+	tokens := make([]IToken, 0)
 
 	if plain_markdown == "" {
-		return []Token{EOFToken()}
+		return []IToken{EOFToken()}
 	}
 
 	token, err := scan_one_token(plain_markdown)
